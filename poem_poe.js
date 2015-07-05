@@ -1,5 +1,5 @@
-var canvasWidth = 700;
-var canvasHeight = 700;
+var canvasWidth = 550;
+var canvasHeight = 800;
 
 var pCanvasElement;
 var pContext;
@@ -24,7 +24,7 @@ function Word(text, xPos, yPos, line, speed, xPosFinal, yPosFinal, wordNo) {
 	this.yPosFinal = yPosFinal;
 	this.wordNo = wordNo;
 	
-	this.radius = Math.round(text.length * 5);
+	this.radius = Math.round(text.length * 7);
 	this.step = 0;
 }
 
@@ -81,12 +81,12 @@ Word.prototype.drawWord = function(draw) {
 		this.xPos=this.xPosFinal;
 		this.yPos=this.yPosFinal;
 	}
-	pContext.font = "bold 12px sans-serif";
+	pContext.font = "bold 16px sans-serif";
 	pContext.fillStyle = "#000000";
 	pContext.fillText(this.text, this.xPos, this.yPos);
 	if (draw) {
-		var offsetY = 6; //half of font size
-		var offsetX = Math.round(this.text.length*3);
+		var offsetY = 8; //half of font size
+		var offsetX = Math.round(this.text.length*4);
 		
 		pContext.beginPath();
 		pContext.arc(this.xPos + offsetX, this.yPos - offsetY, this.radius, 0, Math.PI*2, false);
@@ -128,15 +128,21 @@ function poemStartPosition() {
 	//pContext.fillStyle = "#000000";
 	//pContext.fillRect(0,0,canvasWidth,canvasHeight);
 	
-	poem = [new Word("From",100,650,1,1,50,50, 0),
-			new Word("childhood's",140,650,1,1,100,100, 1),
-			new Word("hour",220,650,1,1,180,100, 2),
-			new Word("I",250,650,1,1,220,100, 3),
-			new Word("have",290,650,1,1,250,100, 4),
-			new Word("not",350,650,1,1,650,100, 5),
-			new Word("been",400,650,1,1,600,100, 6)
+	poem = [new Word("From",50,750,1,1,50,50, 0),
+			new Word("childhood's",103,750,1,1,100,100, 1),
+			new Word("hour",205,750,1,1,180,100, 2),
+			new Word("I",250,750,1,1,220,100, 3),
+			new Word("have",263,750,1,1,250,100, 4),
+			new Word("not",310,750,1,1,650,100, 5),
+			new Word("been",345,750,1,1,600,100, 6)
 			];
+	console.log(pContext.measureText(poem[1].text).width + poem[1].xPos+25);
 			
+	pContext.font = "bold 16px sans-serif";
+	pContext.fillStyle = "#000000";
+	for (var i = 0; i < poem.length;i++){
+		pContext.fillText(poem[i].text, poem[i].xPos, poem[i].yPos);
+	}
 }
 
 function poemCirclePacking() {
@@ -145,7 +151,6 @@ function poemCirclePacking() {
 			
 		}
 	}
-	
 	
 }
 
@@ -205,8 +210,8 @@ function initplay(canvasElement) {
     pCanvasElement.addEventListener("click", playOnClick, false);
 	
 	poemStartPosition();
+	poemCirclePacking();
 	
-	
-	poemAnimate();
+	//poemAnimate();
 
 }
