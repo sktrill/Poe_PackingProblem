@@ -34,6 +34,7 @@ function Word(text, xPos, yPos, line, posFinal, xPosFinal, yPosFinal, wordNo) {
 	this.yPosFinal = yPosFinal;
 	this.wordNo = wordNo;
 	
+	this.locked = false;
 	var length = pContext.measureText(text).width + 3;
 	
 	this.radius = Math.round(length*1.3);
@@ -176,7 +177,7 @@ function poemStartPosition() {
 			new Word("spring",345,750,4,false,0,0, 28),
 			new Word("From",345,750,5,false,0,0, 29),
 			new Word("the",345,750,5,false,0,0, 30),
-			new Word("same",345,750,5,false,0,0, 31),
+/*			new Word("same",345,750,5,false,0,0, 31),
 			new Word("source",345,750,5,false,0,0, 32),
 			new Word(" I ",345,750,5,false,0,0, 33),
 			new Word("have",345,750,5,false,0,0, 34),
@@ -306,7 +307,7 @@ function poemStartPosition() {
 			new Word("demon",345,750,22,false,0,0, 158),
 			new Word("in",345,750,22,false,0,0, 159),
 			new Word("my",345,750,22,false,0,0, 160),
-			new Word("view",345,750,22,false,0,0, 161) 
+			new Word("view",345,750,22,false,0,0, 161) */
 			];			
 	pContext.font = "bold 16px sans-serif";
 	pContext.fillStyle = "#000000";
@@ -334,7 +335,7 @@ function poemCirclePacking() {
 		console.log(poem[k].text);
 		for (var i = 0; i < placements.length; i++) {
 			for (var j = 0; j < poem.length; j++) {
-				if (poem[j].posFinal) {
+				if (poem[j].posFinal && !poem[j].locked) {
 					dist = Math.sqrt(Math.pow((poem[j].xPosFinal - placements[i].xPos),2) + Math.pow((poem[j].yPosFinal - placements[i].yPos),2)) - poem[j].radius - placements[i].radius;
 					dist = Math.round(dist);
 					if (dist == 0) {
@@ -358,6 +359,13 @@ function poemCirclePacking() {
 							}
 						}
 					}
+					
+					if (!poem[j].locked) {
+						if ((overlapCheck(poem[j].xPosFinal + poem[j].radius + 10,poem[j].yPosFinal + poem[j].radius + 10, 10)) && (overlapCheck(poem[j].xPosFinal + poem[j].radius + 10,poem[j].yPosFinal + poem[j].radius - 10, 10)) && (overlapCheck(poem[j].xPosFinal + poem[j].radius - 10,poem[j].yPosFinal + poem[j].radius + 10, 10)) && (overlapCheck(poem[j].xPosFinal + poem[j].radius - 10,poem[j].yPosFinal + poem[j].radius - 10,10))) {
+							poem[j].locked = true;
+						}
+					}
+					
 				}
 			}
 		}
@@ -384,7 +392,7 @@ function findPlacements (word){
 	var newX, newY, newCircle;
 	var placements = new Array();
 	for (var i = 0; i < poem.length;i++){
-		if (poem[i].posFinal) {
+		if (poem[i].posFinal && !poem[i].locked) {
 			// check against top side
 			if (poem[i].yPosFinal - poem[i].radius == 0) {
 				value = findTangency(poem[i].xPosFinal, poem[i].yPosFinal, poem[i].radius, 1, 0, 0, word.radius);
@@ -514,7 +522,7 @@ function overlapCheck(x, y, rad) {
 
 function poemFinalPosPrint(){
 	for (var i = 0; i < poem.length;i++) {
-		console.log(poem[i].text + ", " + poem[i].line + ", " + poem[i].wordNo + ": " + poem[i].xPosFinal + ", " + poem[i].yPosFinal);
+		console.log(poem[i].text + ", " + poem[i].line + ", " + poem[i].wordNo + ": " + poem[i].xPosFinal + ", " + poem[i].yPosFinal + " | " + poem[i].locked);
 	}
 }
 
