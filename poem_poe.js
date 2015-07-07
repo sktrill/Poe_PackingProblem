@@ -7,6 +7,7 @@ var poem = new Array();
 var doneAnimation = new Array();
 var poemComplete;
 
+// request animation frame for browser cross compatibility
 window.requestAnimFrame = (function(callback) {
 	return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
 	function(callback) {
@@ -14,6 +15,7 @@ window.requestAnimFrame = (function(callback) {
 	};
   })();
 
+// object for possible placement of a circle in the container
 function Place(xPos, yPos, radius, tangent1, tangent2, lambda, wordNo) {
 	this.xPos = xPos;
     this.yPos = yPos;
@@ -23,31 +25,33 @@ function Place(xPos, yPos, radius, tangent1, tangent2, lambda, wordNo) {
 	this.lambda = lambda;
 	this.wordNo = wordNo;
 }
-  
+
+// object for each word of the poem  
 function Word(text, xPos, yPos, line, posFinal, xPosFinal, yPosFinal, wordNo) {
 	this.xPos = xPos;
     this.yPos = yPos;
     this.text = text;
 	this.line = line;
-	this.posFinal = posFinal;
-	this.xPosFinal = xPosFinal;
-	this.yPosFinal = yPosFinal;
+	this.posFinal = posFinal; // indicates whether circle is in its final position
+	this.xPosFinal = xPosFinal; // final 'x' position calculated by optimization
+	this.yPosFinal = yPosFinal; // final 'y' position calculated by optimization
 	this.wordNo = wordNo;
 	
-	this.locked = false;
+	this.locked = false; // indicates whether circle is surrounded by other circles
 	var length = pContext.measureText(text).width + 3;
 	
 	this.radius = Math.round(length*1.3);
 	this.step = 0;
 }
 
-
+// sets final position of circle based on optimization 
 Word.prototype.setPos = function(xPosFinal,yPosFinal,posFinal) {
 	this.xPosFinal = xPosFinal;
 	this.yPosFinal = yPosFinal;
 	this.posFinal = posFinal;
 }
 
+// draws word and keeps track of animating movement
 Word.prototype.drawWord = function(draw) {
 	var goingUp, goingDown, goingRight, goingLeft, doneX2, doneY2;
 	goingUp = false;
@@ -57,7 +61,7 @@ Word.prototype.drawWord = function(draw) {
 	doneX = doneAnimation[this.wordNo*2];
 	doneY = doneAnimation[this.wordNo*2 + 1];
 
-	this.step = 0.5;
+	this.step = 0.5; // determines speed of movement, linear motion for this example (can be made more interesting / realistic)
 
 	if (!doneY) {
 		if (this.yPosFinal >= this.yPos) {
@@ -69,7 +73,6 @@ Word.prototype.drawWord = function(draw) {
 			goingUp = true;
 		}
 	}
-	
 	if (!doneX) {
 		if (this.xPosFinal >= this.xPos) {
 			this.xPos += this.step;
@@ -81,13 +84,13 @@ Word.prototype.drawWord = function(draw) {
 		}
 	}
 	
+	// checks for whether the word has reached its final position
 	if (goingUp && this.yPosFinal >= this.yPos) {
 		doneY = true;
 	}
 	else if (goingDown && this.yPosFinal <= this.yPos) {
 		doneY = true;
 	}
-	
 	if (goingRight && this.xPosFinal <= this.xPos) {
 		doneX = true;
 	}
@@ -95,17 +98,22 @@ Word.prototype.drawWord = function(draw) {
 		doneX = true;
 	}
 	
+	// to check if the word is in its final position
 	if (doneX && doneY) {
 		doneAnimation[this.wordNo*2] = doneX;
 		doneAnimation[this.wordNo*2+1] = doneY;
 		this.xPos=this.xPosFinal;
 		this.yPos=this.yPosFinal;
 	}
+	
+	// draw text
 	pContext.font = "bold 16px sans-serif";
 	pContext.fillStyle = "#000000";
 	var offsetY = 8; //half of font size
 	var offsetX = Math.round(this.radius/2);
 	pContext.fillText(this.text, this.xPos - offsetX, this.yPos + offsetY);
+	
+	// draws circle around word (if 'draw' is true)
 	if (draw) {
 		
 		pContext.beginPath();
@@ -116,6 +124,7 @@ Word.prototype.drawWord = function(draw) {
 	
 };
 
+// animates the poem
 function animate(){
 	pContext.clearRect(0, 0, pCanvasElement.width, pCanvasElement.height);
 	
@@ -137,15 +146,17 @@ function animate(){
 	}
 }
 
+// interaction
 function playOnClick(e) {
     //var cell = getCursorPosition(e);
 
 }
 
+// initializes poem
 function poemStartPosition() {
 	//pContext.fillStyle = "#000000";
 	//pContext.fillRect(0,0,canvasWidth,canvasHeight);
-	
+
 	poem = [new Word("From",50,750,1,false,0,0, 0),
 			new Word("childhood's",103,750,1,false,0,0, 1),
 			new Word("hour",205,750,1,false,0,0, 2),
@@ -308,7 +319,8 @@ function poemStartPosition() {
 			new Word("in",345,750,22,false,0,0, 159),
 			new Word("my",345,750,22,false,0,0, 160),
 			new Word("view",345,750,22,false,0,0, 161)
-			];			
+			]; 
+			
 	pContext.font = "bold 16px sans-serif";
 	pContext.fillStyle = "#000000";
 	for (var i = 0; i < poem.length;i++){
@@ -316,10 +328,12 @@ function poemStartPosition() {
 	}
 }
 
-
+// optimizes to fit unequal circles into the rectangular container, see pseudocode for details
 function poemCirclePacking() {
 	var placements = new Array();
 	var lambda, highestY, newX, newY;
+	
+	//first two words are placed in opposing corners
 	poem[0].setPos(poem[0].radius, poem[0].radius, true);
 	poem[1].setPos(canvasWidth - poem[1].radius, poem[1].radius, true);
 	
@@ -331,16 +345,21 @@ function poemCirclePacking() {
 		lambda = -9999;
 		newX = 0;
 		newY = 0;
-		highestY = canvasHeight;
+		highestY = canvasHeight; // this aims to prioritize filling up the top
 		console.log(poem[k].text);
+		
+		/* placements are determined for next word only, in order to try and retain some structure
+		of the poem. Ideally you would find the placements for all words / circles not yet placed
+		(though you would not use JS). As an NP-hard problem this is ideally suited for Py, R or Matlab
+		*/
 		for (var i = 0; i < placements.length; i++) {
-			for (var j = 0; j < poem.length; j++) {
-				if (poem[j].posFinal && !poem[j].locked) {
+			for (var j = 0; j < poem.length; j++) { 
+				if (poem[j].posFinal /*&& !poem[j].locked*/) { // check lambda measurement only for circles inside container and if circles are not locked (i.e. surrounded by other circles)
 					dist = Math.sqrt(Math.pow((poem[j].xPosFinal - placements[i].xPos),2) + Math.pow((poem[j].yPosFinal - placements[i].yPos),2)) - poem[j].radius - placements[i].radius;
 					dist = Math.round(dist);
 					if (dist == 0) {
 						lambda = 1;
-						if (placements[i].yPos < highestY) {
+						if (placements[i].yPos < highestY) { // prioritizes placements closer to the top
 							highestY = placements[i].yPos;
 							newX = placements[i].xPos;
 							newY = highestY;
@@ -360,20 +379,32 @@ function poemCirclePacking() {
 						}
 					}
 					
+					// this is done as a optimization as it allows us to skip a considerable chunk of circles as we get into the higher word numbers
+					/*
 					if (!poem[j].locked) {
 						if ((overlapCheck(poem[j].xPosFinal + poem[j].radius + 10,poem[j].yPosFinal + poem[j].radius + 10, 10)) && (overlapCheck(poem[j].xPosFinal + poem[j].radius + 10,poem[j].yPosFinal + poem[j].radius - 10, 10)) && (overlapCheck(poem[j].xPosFinal + poem[j].radius - 10,poem[j].yPosFinal + poem[j].radius + 10, 10)) && (overlapCheck(poem[j].xPosFinal + poem[j].radius - 10,poem[j].yPosFinal + poem[j].radius - 10,10))) {
 							poem[j].locked = true;
 						}
 					}
-					
+					*/
 				}
+			}
+			if (k == 40) {
+				tempDrawCircle(placements[i].xPos,placements[i].yPos,placements[i].radius, true);
 			}
 		}
 		poem[k].setPos(newX, newY, true);
-		tempDrawCircle(poem[k].xPosFinal,poem[k].yPosFinal,poem[k].radius, false);
+		if (k == 40) {
+			tempDrawCircle(poem[k].xPosFinal,poem[k].yPosFinal,poem[k].radius, true);
+		}
+		else {
+			tempDrawCircle(poem[k].xPosFinal,poem[k].yPosFinal,poem[k].radius, false);
+		}
+		
 	}
 }
 
+// debugging function, draws circles
 function tempDrawCircle(x,y,rad, check){
 		pContext.beginPath();
 		pContext.arc(x, y, rad, 0, Math.PI*2, false);
@@ -386,36 +417,39 @@ function tempDrawCircle(x,y,rad, check){
 		pContext.stroke();		
 }
 
+// finds all possible placements for the next circle entering the container, placement must meet all constraints of the optimization problem
 function findPlacements (word){
 	var j = 0;
 	var value;
 	var newX, newY, newCircle;
 	var placements = new Array();
+	
 	for (var i = 0; i < poem.length;i++){
-		if (poem[i].posFinal && !poem[i].locked) {
+		if (poem[i].posFinal /*&& !poem[i].locked*/) {
 			// check against top side
-			if (poem[i].yPosFinal - poem[i].radius == 0) {
+			if (poem[i].yPosFinal - poem[i].radius - word.radius <= 0) {
 				value = findTangency(poem[i].xPosFinal, poem[i].yPosFinal, poem[i].radius, 1, 0, 0, word.radius);
 				if (value[0] != 0 && value[1] != 0) {
 					placements[j++] = new Place(value[0], value[1], word.radius, -100, poem[i].wordNo, 0, word.wordNo);
 				}
 			}
+			
 			// check against left side
-			if (poem[i].xPosFinal - poem[i].radius == 0) {
+			if (poem[i].xPosFinal - poem[i].radius  - word.radius <= 0) {
 				value = findTangency(poem[i].xPosFinal, poem[i].yPosFinal, poem[i].radius, 0, 1, 0, word.radius);
 				if (value[0] != 0 && value[1] != 0) {
 					placements[j++] = new Place(value[0], value[1], word.radius, -200, poem[i].wordNo, 0, word.wordNo);
 				}
 			}			
 			// check against right side
-			if (poem[i].xPosFinal + poem[i].radius == canvasWidth) {
+			if (poem[i].xPosFinal + poem[i].radius + word.radius >= canvasWidth) {
 				value = findTangency(poem[i].xPosFinal, poem[i].yPosFinal, poem[i].radius, canvasWidth, 1, 0, word.radius);
 				if (value[0] != 0 && value[1] != 0) {
 					placements[j++] = new Place(value[0], value[1], word.radius, -300, poem[i].wordNo, 0, word.wordNo);
 				}
 			}
 			// check against other circles
-			for (var k = 0; k < Math.ceil(poem.length); k++){ // need to only check against half the circles thanks to symmetry
+			for (var k = 0; k < poem.length; k++){ 
 				if (poem[k].posFinal && poem[k].wordNo != poem[i].wordNo) {
 					value = findTangency(poem[i].xPosFinal, poem[i].yPosFinal, poem[i].radius, poem[k].xPosFinal, poem[k].yPosFinal, poem[k].radius, word.radius);
 					if (value[0] != 0 && value[1] != 0) {
@@ -428,12 +462,12 @@ function findPlacements (word){
 	return placements;
 }
 
+// returns the position (x,y) to place a cricle of radius radW given either two circles or a circle and a side
 function findTangency(x1, y1, rad1, x2, y2, rad2, radW) {
 	var finPos = [0, 0];
 	var xStart, xFinish;
 	var yStart, yFinish;
 	var dist, dist2 = 0;
-	var rad = rad1 > rad2 ? rad1 : rad2;
 	
 	if (rad2 == 0) { // one of the sides
 		if (y2 == 0) { // top side
@@ -477,10 +511,10 @@ function findTangency(x1, y1, rad1, x2, y2, rad2, radW) {
 		}
 	}
 	else { // check tangency between two circles
-			xStart = x1 <  x2 ? x1 : x2;
-			xFinish = x1 < x2 ? x2 + rad + radW : x1 + rad + radW;
-			yStart = y1 < y2 ? y1 : y2;
-			yFinish = y1 < y2 ? y2 + rad + radW: y1 + rad + radW;
+			xStart = x1 - rad1 - radW <  x2 - rad2 - radW ? x1 - rad1 - radW : x2 - rad2 - radW;
+			xFinish = x1 + rad1 + radW < x2 + rad2 + radW ? x2 + rad2 + radW : x1 + rad1 + radW;
+			yStart = y1 - rad1 - radW < y2 - rad2 - radW  ? y1 - rad1 - radW : y2 - rad2 - radW ;
+			yFinish = y1 + rad1 + radW < y2 + rad2 + radW ? y2 + rad2 + radW: y1 + rad1 + radW;
 			for (var x = xStart; x < xFinish; x++) {
 				for (var y = yStart; y < yFinish; y++) {
 					dist = Math.sqrt(Math.pow(x1 - x,2) + Math.pow(y1 - y,2)) - rad1 - radW;
@@ -498,7 +532,7 @@ function findTangency(x1, y1, rad1, x2, y2, rad2, radW) {
 	return finPos;
 }
 
-// returns true if overlap is found with existing words
+// returns true if overlap is found within words / circles in the container
 function overlapCheck(x, y, rad) {
 	var dist = 0;
 	
@@ -509,7 +543,7 @@ function overlapCheck(x, y, rad) {
 		return true;
 	}
 	for (var i = 0; i < poem.length;i++){ // check overlap with other words
-		if (poem[i].posFinal) {	
+		if (poem[i].posFinal) {	// only checks circles in the container
 			dist = Math.sqrt(Math.pow((poem[i].xPosFinal - x),2) + Math.pow((poem[i].yPosFinal - y),2)) - poem[i].radius - rad;
 			dist = Math.round(dist);
 			if (dist < 0) {
@@ -520,6 +554,7 @@ function overlapCheck(x, y, rad) {
 	return false;
 }
 
+// prints the results of the optimization to console
 function poemFinalPosPrint(){
 	for (var i = 0; i < poem.length;i++) {
 		console.log(poem[i].text + ", " + poem[i].line + ", " + poem[i].wordNo + ": " + poem[i].xPosFinal + ", " + poem[i].yPosFinal + " | " + poem[i].locked);
@@ -527,6 +562,7 @@ function poemFinalPosPrint(){
 }
 
 
+// calling function to animate poem
 function poemAnimate() {
 	for (var i = 0; i < 2* poem.length;i++) {
 		doneAnimation[i] = false;
@@ -550,9 +586,11 @@ function initplay(canvasElement) {
 	poemComplete = true;
 	
 	poemStartPosition();
-	poemCirclePacking();
-	poemFinalPosPrint();
+	//poemCirclePacking();
+	//poemFinalPosPrint();
 	
+	//var audio = new Audio('poe.mp3');
+	//audio.play();
 	
 	//poemAnimate();
 }

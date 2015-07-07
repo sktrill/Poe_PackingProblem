@@ -21,7 +21,7 @@
 		MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
 	</script>
 	<script type="text/javascript"
-	  src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 	</script>
 	
 	
@@ -86,61 +86,81 @@
 			the maximal density that a set of objects can be placed into a container. Different versions of this problem also go by the knapsack problem or the covering problem.
 			</p>
 			<p>
-			Consider a rectangular container $H \times W$, with a set of circles \(C = {1, 2 ... n}\) of unequal radius
-			The constraints on the optimization can be stated as: 
+			Consider a rectangular container $H \times W$, with a set of $n$ circles \(C = \{C_{1}...C_{i}...C_{n}\}\) of unequal radius \(\{r_{1}...r_{i}...r_{n}\}\) - 
+			proportional to the word they encapsulate - where each circle is placed \(C_{i} = (x_{i}, y_{i}, r_{i})\). The constraints on the optimization can be stated as: 
 			<ol type="I">
 				<li>Unequal circles placed in the container should not extend outside the container</li>
 					<ol type = "i">
-						<li> </li>
-						<li> </li>
-						<li> </li>
-						<li> </li>
+						<li>\(y_{i} - r_{i} \geq 0\), &nbsp &nbsp \(\forall  i \in \{1,...,n\} \)</li>
+						<li>\(y_{i} + r_{i} \leq H\), &nbsp &nbsp \(\forall  i \in \{1,...,n\} \)</li>
+						<li> \(x_{i} - r_{i} \geq 0\), &nbsp &nbsp \(\forall  i \in \{1,...,n\} \)</li>
+						<li>\(x_{i} + r_{i} \leq W\), &nbsp &nbsp \(\forall  i \in \{1,...,n\} \)</li>
 					</ol>
 				<li>Unequal circles cannot overlap each other</li>
-				<li>Packing aim to retain the structure of the poem, where possible</li>
+					<ol type = "i">
+						<li>\(\sqrt{(x_{i} - x_{j})^{2} + (y_{i} - y_{j})^{2}} - r_{i} - r_{j} \geq 0 \), &nbsp &nbsp \(\forall  i \neq j \in \{1,...,n\} \) </li>
+					</ol>
+				<li>Retain the structure of the poem, where possible</li>
 			</ol>
-			The minimax decision rule for the perfect player works by aiming to minimize the maximum payoff possible for the other player. This payoff is calculated by a heuristic
-			evaluation (<code>function scoreCalc()</code>) that calculates the winning state of a board. The minimax can be thought of as exploring the nodes of a 
+			</p>
+			
+			<img class = "figures" src="d1layout.jpg" alt="Container layout">
+			<p class = "figurecaption">
+			Figure 1. Layout of rectangular container with first two circles placed
+			</p>
+			
 			<p>
-			The pseudocode used in the <code>function alphaBetaMM()</code> is provided below:
+			As shown in Figure 1, the first two circles are placed in opposite corners of the container. Possible placements for subsequent circles are determined by finding
+			all locations in the container that place the new circle tangent to an existing circle and a side (top, left or right) or tangent to two existing circles -  
+			this is done by <code>function findPlacements()</code> and <code>function findTangency()</code>, as shown in Figure 2.
+			A hole degree $\lambda$ is determined by calculating the distance of the new circle from all other placed circles and the sides of the rectangle (not including
+			the ones that the placement option is tangent to). 
+			</p>
+			<p>
+			The optimization rule looks to find the placement option with the maximum hole degree $\lambda$ for each circle: \(\lambda = (1 - \frac{d_{min}}{r_{i}}) \). 
+			Once all circles are placed in the container the process is 
+			complete with success, if a circle could not be placed then the process returns with failure. 
+			</p>
+			
+			<img class = "figures" src="d2places.jpg" alt="Placement options">
+			<p class = "figurecaption">
+			Figure 2. Optimized placement options for third word ('I')
+			</p>
+			
+			<p>
+			The pseudocode used in the <code>function poemCirclePacking()</code> is provided below:
 			</p>
 			<div class = "pseudo">
 				<pre>
-01 <b>function</b> alphaBetaMM(depth, α, β, maxPlayer, turns)
-02    calculate all possible next moves
-03    <b>if</b> terminal node (i.e. next move ends the game) or depth = 0
-04        value = heuristic value of that node from scoreCalc(turns)
-05        <b>return</b> the heuristic value of that node
-06    <b>else</b>
-07        <b>for</b> each child of node (i.e. for each next move)
-08            <b>if</b> maxPlayer
-09                value := alphaBetaMM(depth - 1,α, β, minPlayer,turns)
-10                α = max(α, value)
-11                value = α
-12            <b>else</b>
-13                value := alphaBetaMM(depth - 1,α, β, maxPlayer,turns)
-14                β = min(β, value)
-15                value = β
-16            <b>if</b> β ≤ α
-17                <b>break</b>
-18    <b>return</b> value;
-					</pre>
+01 <b>function</b> poemCirclePacking()
+02    place first two circles in opposing corners
+03    <b>for</b> each remaining circle (n - 2)
+04        calculate all possible places for the next circle
+05        <b>for</b> all placement options
+06            <b>for</b> all other circles in the container
+07                   calculate dist to other circles in the container
+08                   calculate lambda
+09                   select the place with max lambda
+11        place the new circle in the place determined
+				</pre>
 				</div>
 				<h2>Concluding Thoughts</h2>
 				<p>
+				As a NP-hard problem this is certainly not suited for JS but I made the choice for the sake of the animation and HTML5 audio. If you're going to 
+				try this on your own I'd advice using something more practical like Py, R or Matlab (esp. if the number of circles / words are more than 70). 
 				For more check out the following papers:
 				<ul>
-					<li> </li>
-					<li> </li>
+					<li>Kubach, T., Bortfeldt, A., Gehring, H.: Parallel greedy algorithms for packing unequal circles into a strip or a rectangle. Cent. Eur. J. Oper. Res. 17, 461-477 (2009)</li>
+					<li>Huang, W.Q., Li Y., Li, C.M., Xu, R.C: New Heuristics for packing unequal circles into a circular container. Comput. Oper. Res. 33, 2125-2142 (2006)</li>
 				</ul>
 				</p>
 			</div>
 			<div class="col-md-6" id="gameDiv">
-				<div class = "player">
-					<a onclick = "pcStart()"><span class="glyphicon glyphicon-hdd playerSelect"></span></a>
-					<a onclick = "playerStart()"><span class="glyphicon glyphicon-user playerSelect"></span></a>
-				</div>
+			<h3 class = "gameSummary"><span id="movecount">Press play to start</span></h3>
+			<div class = "play">
+				<a onclick = "pcStart()"><span class="glyphicon glyphicon-play playSelect"></span></a>
 				<canvas id="canvas" style="border:1px solid #000000;"></canvas>
+			</div>
 			</div>
 		</div>
 	</div>

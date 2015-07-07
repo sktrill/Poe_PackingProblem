@@ -2,10 +2,6 @@ body {
 	padding-top: 50px;
 }
 
-.aside {
-	font-size: 12px;
-}
-
 .pseudo {
 	padding-left: 20px;
 }
@@ -14,7 +10,18 @@ body {
 	text-align: center;
 }
 
-.playerSelect {
+.figures  {
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.figurecaption  {
+	text-align: center;
+	font-size: 12px;
+}
+
+.playSelect {
 	font-size: 40px;
 	margin-left: auto;
 	margin-right: auto;
@@ -22,7 +29,7 @@ body {
 	padding-right: 10px;
 }
 
-.player {
+.play {
 	text-align: center;
 }
 
