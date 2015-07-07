@@ -16,6 +16,13 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	<link href="custom.css" rel="stylesheet">
+	<!-- MathJax -->
+	<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+	</script>
+	<script type="text/javascript"
+	  src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
 	
 	
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -37,7 +44,7 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">More Experiments<span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Tic Tac Toe</a></li>
+                <li><a href="https://sk-tictactoe-alphabetamm.herokuapp.com/">Tic Tac Toe</a></li>
                 <li><a href="#">Collab Filtering Example</a></li>
                 <li><a href="#">PGM Example</a></li>
 				<li><a href="#">R Visualization Example</a></li>
@@ -75,10 +82,23 @@
 			</p>
 			<h2>Solution</h2>
 			<p>
-			TTT is a two-person zero-sum game (a game such that each player's gain / loss utility is balanced by the other's loss / gain) with perfect information 
-			(since players play in turn neither player has an information advantage over the other), which lends itself to the <a href="https://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves" target="_blank">minimax</a> decision rule strategy. 
+			The <a href="https://en.wikipedia.org/wiki/Packing_problems" target="_blank">packing problem</a> is a class of optimization problems that involves finding 
+			the maximal density that a set of objects can be placed into a container. Different versions of this problem also go by the knapsack problem or the covering problem.
 			</p>
 			<p>
+			Consider a rectangular container $H \times W$, with a set of circles \(C = {1, 2 ... n}\) of unequal radius
+			The constraints on the optimization can be stated as: 
+			<ol type="I">
+				<li>Unequal circles placed in the container should not extend outside the container</li>
+					<ol type = "i">
+						<li> </li>
+						<li> </li>
+						<li> </li>
+						<li> </li>
+					</ol>
+				<li>Unequal circles cannot overlap each other</li>
+				<li>Packing aim to retain the structure of the poem, where possible</li>
+			</ol>
 			The minimax decision rule for the perfect player works by aiming to minimize the maximum payoff possible for the other player. This payoff is calculated by a heuristic
 			evaluation (<code>function scoreCalc()</code>) that calculates the winning state of a board. The minimax can be thought of as exploring the nodes of a 
 			<p>
@@ -108,9 +128,11 @@
 				</div>
 				<h2>Concluding Thoughts</h2>
 				<p>
-				The Tic Tac Toe alpha-beta minimax solution is not a difficult solution but will serve us well as we look to explore game solutions for more interesting games (Othello, Mancala etc). 
-				That said TTT can be made quite interesting by adding additional dimensions (or even a <a href="https://en.wikipedia.org/wiki/Quantum_tic-tac-toe" target="_blank">quantum twist</a>).
-				In his Scientific American Tic Tac Toe piece, Gardner shows how these additions can make even this age old game non-trivial:
+				For more check out the following papers:
+				<ul>
+					<li> </li>
+					<li> </li>
+				</ul>
 				</p>
 			</div>
 			<div class="col-md-6" id="gameDiv">

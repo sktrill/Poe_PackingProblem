@@ -177,7 +177,7 @@ function poemStartPosition() {
 			new Word("spring",345,750,4,false,0,0, 28),
 			new Word("From",345,750,5,false,0,0, 29),
 			new Word("the",345,750,5,false,0,0, 30),
-/*			new Word("same",345,750,5,false,0,0, 31),
+			new Word("same",345,750,5,false,0,0, 31),
 			new Word("source",345,750,5,false,0,0, 32),
 			new Word(" I ",345,750,5,false,0,0, 33),
 			new Word("have",345,750,5,false,0,0, 34),
@@ -307,7 +307,7 @@ function poemStartPosition() {
 			new Word("demon",345,750,22,false,0,0, 158),
 			new Word("in",345,750,22,false,0,0, 159),
 			new Word("my",345,750,22,false,0,0, 160),
-			new Word("view",345,750,22,false,0,0, 161) */
+			new Word("view",345,750,22,false,0,0, 161)
 			];			
 	pContext.font = "bold 16px sans-serif";
 	pContext.fillStyle = "#000000";
