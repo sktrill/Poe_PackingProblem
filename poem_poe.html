@@ -156,11 +156,12 @@
 				</p>
 			</div>
 			<div class="col-md-6" id="gameDiv">
-			<h3 class = "gameSummary"><span id="movecount">Press play to start</span></h3>
+			<h3 class = "gameSummary"><span id="displayText">Press play to start</span></h3>
 			<div class = "play">
-				<a onclick = "pcStart()"><span class="glyphicon glyphicon-play playSelect"></span></a>
-				<canvas id="canvas" style="border:1px solid #000000;"></canvas>
+				<button class="btn btn-info btn-xs" id = "startButton" onclick = "poemStart()"><span class="glyphicon glyphicon-play playSelect"></span></button>
+				<canvas id="canvas"></canvas>
 			</div>
+			<p></p>
 			</div>
 		</div>
 	</div>
@@ -168,7 +169,7 @@
 	<!-- Scripts -->
 	<script src="poem_poe.js"></script>	
 	<script>
-		initplay(canvas, document.getElementById('movecount'),"gameDiv");
+		initplay(canvas, document.getElementById('startButton'), document.getElementById('displayText'), "gameDiv");
 	</script>
 </body>
 </html>

@@ -1,11 +1,15 @@
 var canvasWidth = 550;
-var canvasHeight = 1600;
+var canvasHeight = 1200;
 
 var pCanvasElement;
 var pContext;
+var pButton;
 var poem = new Array();
 var doneAnimation = new Array();
 var poemComplete;
+var alphaTitle; // opacity for title
+var speedStep; // for animation speed
+var speedCount; // for animation
 
 // request animation frame for browser cross compatibility
 window.requestAnimFrame = (function(callback) {
@@ -52,7 +56,7 @@ Word.prototype.setPos = function(xPosFinal,yPosFinal,posFinal) {
 }
 
 // draws word and keeps track of animating movement
-Word.prototype.drawWord = function(draw) {
+Word.prototype.drawWord = function(draw, step) {
 	var goingUp, goingDown, goingRight, goingLeft, doneX2, doneY2;
 	goingUp = false;
 	goingDown = false;
@@ -61,7 +65,7 @@ Word.prototype.drawWord = function(draw) {
 	doneX = doneAnimation[this.wordNo*2];
 	doneY = doneAnimation[this.wordNo*2 + 1];
 
-	this.step = 0.5; // determines speed of movement, linear motion for this example (can be made more interesting / realistic)
+	this.step = step; // determines speed of movement, linear motion for this example (can be made more interesting / realistic)
 
 	if (!doneY) {
 		if (this.yPosFinal >= this.yPos) {
@@ -108,7 +112,7 @@ Word.prototype.drawWord = function(draw) {
 	
 	// draw text
 	pContext.font = "bold 16px sans-serif";
-	pContext.fillStyle = "#000000";
+	pContext.fillStyle = "#ffffff";
 	var offsetY = 8; //half of font size
 	var offsetX = Math.round(this.radius/2);
 	pContext.fillText(this.text, this.xPos - offsetX, this.yPos + offsetY);
@@ -118,7 +122,7 @@ Word.prototype.drawWord = function(draw) {
 		
 		pContext.beginPath();
 		pContext.arc(this.xPos, this.yPos, this.radius, 0, Math.PI*2, false);
-		pContext.strokeStyle = "#000000";
+		pContext.strokeStyle = "#ffffff";
 		pContext.stroke();	
 	}
 	
@@ -127,10 +131,35 @@ Word.prototype.drawWord = function(draw) {
 // animates the poem
 function animate(){
 	pContext.clearRect(0, 0, pCanvasElement.width, pCanvasElement.height);
+	pContext.fillStyle = "#191919";
+	pContext.fillRect(0,0,canvasWidth,canvasHeight);
 	
+	if (alphaTitle >= 0) {
+		pContext.font = "bold 20px sans-serif";
+		pContext.fillStyle = "#ffffff";
+		pContext.globalAlpha = alphaTitle;
+		pContext.fillText("Alone by Edgar Allan Poe", 100, 220);
+		alphaTitle = alphaTitle - 0.01;
+		pContext.globalAlpha = 1;
+	}
+	
+	if (speedCount == 500) {
+		speedStep += 0.1;
+	}
+	else if (speedCount == 1000) {
+		speedStep += 0.2;
+	}
+	else if (speedCount == 1500) {
+		speedStep += 0.2;
+	}	
+	else if (speedCount == 2000) {
+		speedStep += 0.2;
+	}
+	
+	speedCount++;
 	poemComplete = true;
 	for (var i = 0; i < poem.length;i++) {
-		poem[i].drawWord(true);
+		poem[i].drawWord(true, speedStep);	
 		if (!doneAnimation[i*2] || !doneAnimation[i*2 + 1]){ 
 			poemComplete = false;
 		}
@@ -154,175 +183,391 @@ function playOnClick(e) {
 
 // initializes poem
 function poemStartPosition() {
-	//pContext.fillStyle = "#000000";
-	//pContext.fillRect(0,0,canvasWidth,canvasHeight);
-
-	poem = [new Word("From",50,750,1,false,0,0, 0),
-			new Word("childhood's",103,750,1,false,0,0, 1),
-			new Word("hour",205,750,1,false,0,0, 2),
-			new Word(" I ",250,750,1,false,0,0, 3),
-			new Word("have",263,750,1,false,0,0, 4),
-			new Word("not",310,750,1,false,0,0, 5),
-			new Word("been",345,750,1,false,0,0, 6),
-			new Word("As",345,750,2,false,0,0, 7),
-			new Word("others",345,750,2,false,0,0, 8),
-			new Word("were",345,750,2,false,0,0, 9),
-			new Word(" - ",345,750,2,false,0,0, 10),
-			new Word(" I ",345,750,2,false,0,0, 11),
-			new Word("have",345,750,2,false,0,0, 12),
-			new Word("not",345,750,2,false,0,0, 13),
-			new Word("seen",345,750,2,false,0,0, 14),
-			new Word("As",345,750,3,false,0,0, 15),
-			new Word("others",345,750,3,false,0,0, 16),
-			new Word("saw",345,750,3,false,0,0, 17),
-			new Word(" - ",345,750,3,false,0,0, 18),
-			new Word(" I ",345,750,3,false,0,0, 19),
-			new Word("could",345,750,3,false,0,0, 20),
-			new Word("not",345,750,3,false,0,0, 21),
-			new Word("bring",345,750,3,false,0,0, 22),
-			new Word("My",345,750,4,false,0,0, 23),
-			new Word("passions",345,750,4,false,0,0, 24),
-			new Word("from",345,750,4,false,0,0, 25),
-			new Word(" a ",345,750,4,false,0,0, 26),
-			new Word("common",345,750,4,false,0,0, 27),
-			new Word("spring",345,750,4,false,0,0, 28),
-			new Word("From",345,750,5,false,0,0, 29),
-			new Word("the",345,750,5,false,0,0, 30),
-			new Word("same",345,750,5,false,0,0, 31),
-			new Word("source",345,750,5,false,0,0, 32),
-			new Word(" I ",345,750,5,false,0,0, 33),
-			new Word("have",345,750,5,false,0,0, 34),
-			new Word("not",345,750,5,false,0,0, 35),
-			new Word("taken",345,750,5,false,0,0, 36),
-			new Word("My",345,750,6,false,0,0, 37),
-			new Word("sorrow",345,750,6,false,0,0, 38),
-			new Word(" - ",345,750,6,false,0,0, 39),
-			new Word(" I ",345,750,6,false,0,0, 40),
-			new Word("could",345,750,6,false,0,0,41),
-			new Word("not",345,750,6,false,0,0, 42),
-			new Word("awaken",345,750,6,false,0,0, 43),
-			new Word("My",345,750,7,false,0,0, 44),
-			new Word("heart",345,750,7,false,0,0, 45),
-			new Word("to",345,750,7,false,0,0, 46),
-			new Word("joy",345,750,7,false,0,0, 47),
-			new Word("at",345,750,7,false,0,0, 48),
-			new Word("the",345,750,7,false,0,0, 49),
-			new Word("same",345,750,7,false,0,0, 50),
-			new Word("tone",345,750,7,false,0,0, 51),
-			new Word(" - ",345,750,7,false,0,0, 52),
-			new Word("And",345,750,8,false,0,0, 53),
-			new Word("all",345,750,8,false,0,0, 54),
-			new Word("I",345,750,8,false,0,0, 55),
-			new Word("lov'd",345,750,8,false,0,0, 56),
-			new Word(" - ",345,750,8,false,0,0, 57),
-			new Word(" I ",345,750,8,false,0,0, 58),
-			new Word("lov'd",345,750,8,false,0,0, 59),
-			new Word("alone",345,750,8,false,0,0, 60),
-			new Word(" - ",345,750,8,false,0,0, 61),
-			new Word("Then",345,750,9,false,0,0, 62),
-			new Word(" - ",345,750,9,false,0,0, 63),
-			new Word("in",345,750,9,false,0,0, 64),
-			new Word("my",345,750,9,false,0,0, 65),
-			new Word("childhood",345,750,9,false,0,0, 66),
-			new Word(" - ",345,750,9,false,0,0, 67),
-			new Word("in",345,750,9,false,0,0, 68),
-			new Word("the",345,750,9,false,0,0, 69),
-			new Word("dawn",345,750,9,false,0,0, 70),
-			new Word("Of",345,750,10,false,0,0, 71),
-			new Word("a",345,750,10,false,0,0, 72),
-			new Word("most",345,750,10,false,0,0, 73),
-			new Word("stormy",345,750,10,false,0,0, 74),
-			new Word("life",345,750,10,false,0,0, 75),
-			new Word(" - ",345,750,10,false,0,0, 76),
-			new Word("was",345,750,10,false,0,0, 77),
-			new Word("drawn",345,750,10,false,0,0, 78),
-			new Word("From",345,750,11,false,0,0, 79),
-			new Word("ev'ry",345,750,11,false,0,0, 80),
-			new Word("depth",345,750,11,false,0,0, 81),
-			new Word("of",345,750,11,false,0,0, 82),
-			new Word("good",345,750,11,false,0,0, 83),
-			new Word("and",345,750,11,false,0,0, 84),
-			new Word("ill",345,750,11,false,0,0, 85),
-			new Word("The",345,750,12,false,0,0, 86),
-			new Word("mystery",345,750,12,false,0,0, 87),
-			new Word("which",345,750,12,false,0,0, 88),
-			new Word("binds",345,750,12,false,0,0, 89),
-			new Word("me",345,750,12,false,0,0, 90),
-			new Word("still",345,750,12,false,0,0, 91),
-			new Word(" - ",345,750,12,false,0,0, 92),
-			new Word("From",345,750,13,false,0,0, 93),
-			new Word("the",345,750,13,false,0,0, 94),
-			new Word("torrent,",345,750,13,false,0,0, 95),
-			new Word("or",345,750,13,false,0,0, 96),
-			new Word("the",345,750,13,false,0,0, 97),
-			new Word("fountain",345,750,13,false,0,0, 98),
-			new Word(" - ",345,750,13,false,0,0, 99),
-			new Word("From",345,750,14,false,0,0, 100),
-			new Word("the",345,750,14,false,0,0, 101),
-			new Word("red",345,750,14,false,0,0, 102),
-			new Word("cliff",345,750,14,false,0,0, 103),
-			new Word("of",345,750,14,false,0,0, 104),
-			new Word("the",345,750,14,false,0,0, 105),
-			new Word("mountain",345,750,14,false,0,0, 106),
-			new Word(" - ",345,750,14,false,0,0, 107),
-			new Word("From",345,750,15,false,0,0, 108),
-			new Word("the",345,750,15,false,0,0, 109),
-			new Word("sun",345,750,15,false,0,0, 110),
-			new Word("that",345,750,15,false,0,0, 111),
-			new Word("'round",345,750,15,false,0,0, 112),
-			new Word("me",345,750,15,false,0,0, 113),
-			new Word("roll'd",345,750,15,false,0,0,114),
-			new Word("In",345,750,16,false,0,0, 115),
-			new Word("its",345,750,16,false,0,0, 116),
-			new Word("autumn",345,750,16,false,0,0, 117),
-			new Word("tint",345,750,16,false,0,0, 118),
-			new Word("of",345,750,16,false,0,0, 119),
-			new Word("gold",345,750,16,false,0,0, 120),
-			new Word(" - ",345,750,16,false,0,0, 121),
-			new Word("From",345,750,17,false,0,0, 122),
-			new Word("the",345,750,17,false,0,0, 123),
-			new Word("lightning",345,750,17,false,0,0, 124),
-			new Word("in",345,750,17,false,0,0, 125),
-			new Word("the",345,750,17,false,0,0, 126),
-			new Word("sky",345,750,17,false,0,0, 127),
-			new Word("As",345,750,18,false,0,0, 128),
-			new Word("it",345,750,18,false,0,0, 129),
-			new Word("pass'd",345,750,18,false,0,0, 130),
-			new Word("me",345,750,18,false,0,0, 131),
-			new Word("flying",345,750,18,false,0,0, 132),
-			new Word("by",345,750,18,false,0,0, 133),
-			new Word(" - ",345,750,18,false,0,0, 134),
-			new Word("From",345,750,19,false,0,0, 135),
-			new Word("the",345,750,19,false,0,0, 136),
-			new Word("thunder,",345,750,19,false,0,0, 137),
-			new Word("and",345,750,19,false,0,0, 138),
-			new Word("the",345,750,19,false,0,0, 139),
-			new Word("storm",345,750,19,false,0,0, 140),
-			new Word(" - ",345,750,19,false,0,0, 141),
-			new Word("And",345,750,20,false,0,0, 142),
-			new Word("the",345,750,20,false,0,0, 143),
-			new Word("cloud",345,750,20,false,0,0, 144),
-			new Word("that",345,750,20,false,0,0, 145),
-			new Word("took",345,750,20,false,0,0, 146),
-			new Word("the",345,750,20,false,0,0, 147),
-			new Word("form",345,750,20,false,0,0, 148),
-			new Word("(When",345,750,21,false,0,0, 149),
-			new Word("the",345,750,21,false,0,0, 150),
-			new Word("rest",345,750,21,false,0,0, 151),
-			new Word("of",345,750,21,false,0,0, 152),
-			new Word("Heaven",345,750,21,false,0,0, 153),
-			new Word("was",345,750,21,false,0,0, 154),
-			new Word("blue)",345,750,21,false,0,0, 155),
-			new Word("Of",345,750,22,false,0,0, 156),
-			new Word("a",345,750,22,false,0,0, 157),
-			new Word("demon",345,750,22,false,0,0, 158),
-			new Word("in",345,750,22,false,0,0, 159),
-			new Word("my",345,750,22,false,0,0, 160),
-			new Word("view",345,750,22,false,0,0, 161)
-			]; 
+		poem = [new Word("From",100,250,1,false,0,0, 0),
+			new Word("childhood's",150,250,1,false,0,0, 1),
+			new Word("hour",250,250,1,false,0,0, 2),
+			new Word(" I ",290,250,1,false,0,0, 3),
+			new Word("have",310,250,1,false,0,0, 4),
+			new Word("not",355,250,1,false,0,0, 5),
+			new Word("been",390,250,1,false,0,0, 6),
 			
+			new Word("As",100,270,2,false,0,0, 7),
+			new Word("others",130,270,2,false,0,0, 8),
+			new Word("were",190,270,2,false,0,0, 9),
+			new Word(" - ",230,270,2,false,0,0, 10),
+			new Word(" I ",245,270,2,false,0,0, 11),
+			new Word("have",265,270,2,false,0,0, 12),
+			new Word("not",310,270,2,false,0,0, 13),
+			new Word("seen",345,270,2,false,0,0, 14),
+			
+			new Word("As",100,290,3,false,0,0, 15),
+			new Word("others",130,290,3,false,0,0, 16),
+			new Word("saw",190,290,3,false,0,0, 17),
+			new Word(" - ",225,290,3,false,0,0, 18),
+			new Word(" I ",240,290,3,false,0,0, 19),
+			new Word("could",255,290,3,false,0,0, 20),
+			new Word("not",310,290,3,false,0,0, 21),
+			new Word("bring",345,290,3,false,0,0, 22),
+			
+			new Word("My",100,310,4,false,0,0, 23),
+			new Word("passions",130,310,4,false,0,0, 24),
+			new Word("from",210,310,4,false,0,0, 25),
+			new Word(" a ",250,310,4,false,0,0, 26),
+			new Word("common",270,310,4,false,0,0, 27),
+			new Word("spring",345,310,4,false,0,0, 28),
+			
+			new Word("From",100,330,5,false,0,0, 29),
+			new Word("the",150,330,5,false,0,0, 30),
+			new Word("same",185,330,5,false,0,0, 31),
+			new Word("source",235,330,5,false,0,0, 32),
+			new Word(" I ",290,330,5,false,0,0, 33),
+			new Word("have",310,330,5,false,0,0, 34),
+			new Word("not",355,330,5,false,0,0, 35),
+			new Word("taken",390,330,5,false,0,0, 36),
+			
+			new Word("My",100,350,6,false,0,0, 37),
+			new Word("sorrow",130,350,6,false,0,0, 38),
+			new Word(" - ",190,350,6,false,0,0, 39),
+			new Word(" I ",205,350,6,false,0,0, 40),
+			new Word("could",225,350,6,false,0,0,41),
+			new Word("not",275,350,6,false,0,0, 42),
+			new Word("awaken",310,350,6,false,0,0, 43),
+			
+			new Word("My",100, 370, 7, false,0,0, 44),
+			new Word("heart",130,370,7,false,0,0, 45),
+			new Word("to",180,370,7,false,0,0, 46),
+			new Word("joy",205,370,7,false,0,0, 47),
+			new Word("at",240,370,7,false,0,0, 48),
+			new Word("the",265,370,7,false,0,0, 49),
+			new Word("same",300,370,7,false,0,0, 50),
+			new Word("tone",350,370,7,false,0,0, 51),
+			new Word(" - ",385,370,7,false,0,0, 52),
+			
+			new Word("And",100,390,8,false,0,0, 53),
+			new Word("all",140,390,8,false,0,0, 54),
+			new Word("I",170,390,8,false,0,0, 55),
+			new Word("lov'd",185,390,8,false,0,0, 56),
+			new Word(" - ",225,390,8,false,0,0, 57),
+			new Word(" I ",240,390,8,false,0,0, 58),
+			new Word("lov'd",260,390,8,false,0,0, 59),
+			new Word("alone",300,390,8,false,0,0, 60),
+			new Word(" - ",345,390,8,false,0,0, 61),
+			
+			new Word("Then",100,410,9,false,0,0, 62),
+			new Word(" - ",140,410,9,false,0,0, 63),
+			new Word("in",160,410,9,false,0,0, 64),
+			new Word("my",185,410,9,false,0,0, 65),
+			new Word("childhood",220,410,9,false,0,0, 66),
+			new Word(" - ",300,410,9,false,0,0, 67),
+			new Word("in",320,410,9,false,0,0, 68),
+			new Word("the",345,410,9,false,0,0, 69),
+			new Word("dawn",375,410,9,false,0,0, 70),
+			
+			new Word("Of",100,430,10,false,0,0, 71),
+			new Word("a",125,430,10,false,0,0, 72),
+			new Word("most",140,430,10,false,0,0, 73),
+			new Word("stormy",185,430,10,false,0,0, 74),
+			new Word("life",250,430,10,false,0,0, 75),
+			new Word(" - ",275,430,10,false,0,0, 76),
+			new Word("was",295,430,10,false,0,0, 77),
+			new Word("drawn",335,430,10,false,0,0, 78),
+			
+			new Word("From",100,450,11,false,0,0, 79),
+			new Word("ev'ry",150,450,11,false,0,0, 80),
+			new Word("depth",195,450,11,false,0,0, 81),
+			new Word("of",245,450,11,false,0,0, 82),
+			new Word("good",270,450,11,false,0,0, 83),
+			new Word("and",315,450,11,false,0,0, 84),
+			new Word("ill",350,450,11,false,0,0, 85),
+			
+			new Word("The",100,470,12,false,0,0, 86),
+			new Word("mystery",140,470,12,false,0,0, 87),
+			new Word("which",215,470,12,false,0,0, 88),
+			new Word("binds",270,470,12,false,0,0, 89),
+			new Word("me",320,470,12,false,0,0, 90),
+			new Word("still",350,470,12,false,0,0, 91),
+			new Word(" - ",380,470,12,false,0,0, 92),
+			
+			new Word("From",100,490,13,false,0,0, 93),
+			new Word("the",150,490,13,false,0,0, 94),
+			new Word("torrent,",185,490,13,false,0,0, 95),
+			new Word("or",250,490,13,false,0,0, 96),
+			new Word("the",275,490,13,false,0,0, 97),
+			new Word("fountain",310,490,13,false,0,0, 98),
+			new Word(" - ",375,490,13,false,0,0, 99),
+			
+			new Word("From",100,510,14,false,0,0, 100),
+			new Word("the",150,510,14,false,0,0, 101),
+			new Word("red",185,510,14,false,0,0, 102),
+			new Word("cliff",220,510,14,false,0,0, 103),
+			new Word("of",255,510,14,false,0,0, 104),
+			new Word("the",280,510,14,false,0,0, 105),
+			new Word("mountain",315,510,14,false,0,0, 106),
+			new Word(" - ",390,510,14,false,0,0, 107),
+			
+			new Word("From",100,530,15,false,0,0, 108),
+			new Word("the",150,530,15,false,0,0, 109),
+			new Word("sun",185,530,15,false,0,0, 110),
+			new Word("that",220,530,15,false,0,0, 111),
+			new Word("'round",255,530,15,false,0,0, 112),
+			new Word("me",315,530,15,false,0,0, 113),
+			new Word("roll'd",345,530,15,false,0,0,114),
+			
+			new Word("In",100,550,16,false,0,0, 115),
+			new Word("its",120,550,16,false,0,0, 116),
+			new Word("autumn",150,550,16,false,0,0, 117),
+			new Word("tint",220,550,16,false,0,0, 118),
+			new Word("of",255,550,16,false,0,0, 119),
+			new Word("gold",280,550,16,false,0,0, 120),
+			new Word(" - ",315,550,16,false,0,0, 121),
+			
+			new Word("From",100,570,17,false,0,0, 122),
+			new Word("the",150,570,17,false,0,0, 123),
+			new Word("lightning",185,570,17,false,0,0, 124),
+			new Word("in",260,570,17,false,0,0, 125),
+			new Word("the",280,570,17,false,0,0, 126),
+			new Word("sky",315,570,17,false,0,0, 127),
+			
+			new Word("As",100,590,18,false,0,0, 128),
+			new Word("it",130,590,18,false,0,0, 129),
+			new Word("pass'd",150,590,18,false,0,0, 130),
+			new Word("me",210,590,18,false,0,0, 131),
+			new Word("flying",240,590,18,false,0,0, 132),
+			new Word("by",290,590,18,false,0,0, 133),
+			new Word(" - ",310,590,18,false,0,0, 134),
+			
+			new Word("From",100,610,19,false,0,0, 135),
+			new Word("the",150,610,19,false,0,0, 136),
+			new Word("thunder,",185,610,19,false,0,0, 137),
+			new Word("and",255,610,19,false,0,0, 138),
+			new Word("the",290,610,19,false,0,0, 139),
+			new Word("storm",320,610,19,false,0,0, 140),
+			new Word(" - ",365,610,19,false,0,0, 141),
+			
+			new Word("And",100,630,20,false,0,0, 142),
+			new Word("the",140,630,20,false,0,0, 143),
+			new Word("cloud",170,630,20,false,0,0, 144),
+			new Word("that",220,630,20,false,0,0, 145),
+			new Word("took",260,630,20,false,0,0, 146),
+			new Word("the",300,630,20,false,0,0, 147),
+			new Word("form",330,630,20,false,0,0, 148),
+			
+			new Word("(When",100,650,21,false,0,0, 149),
+			new Word("the",155,650,21,false,0,0, 150),
+			new Word("rest",185,650,21,false,0,0, 151),
+			new Word("of",220,650,21,false,0,0, 152),
+			new Word("Heaven",245,650,21,false,0,0, 153),
+			new Word("was",310,650,21,false,0,0, 154),
+			new Word("blue)",350,650,21,false,0,0, 155),
+			
+			new Word("Of",100,670,22,false,0,0, 156),
+			new Word("a",125,670,22,false,0,0, 157),
+			new Word("demon",140,670,22,false,0,0, 158),
+			new Word("in",200,670,22,false,0,0, 159),
+			new Word("my",220,670,22,false,0,0, 160),
+			new Word("view",250,670,22,false,0,0, 161)
+			]; 
+	
+	/* unfilled poem for circle packing analysis
+		poem = [new Word("From",100,250,1,false,0,0, 0),
+			new Word("childhood's",150,250,1,false,0,0, 1),
+			new Word("hour",250,250,1,false,0,0, 2),
+			new Word(" I ",290,250,1,false,0,0, 3),
+			new Word("have",310,250,1,false,0,0, 4),
+			new Word("not",355,250,1,false,0,0, 5),
+			new Word("been",390,250,1,false,0,0, 6),
+			
+			new Word("As",100,270,2,false,0,0, 7),
+			new Word("others",130,270,2,false,0,0, 8),
+			new Word("were",190,270,2,false,0,0, 9),
+			new Word(" - ",230,270,2,false,0,0, 10),
+			new Word(" I ",245,270,2,false,0,0, 11),
+			new Word("have",265,270,2,false,0,0, 12),
+			new Word("not",310,270,2,false,0,0, 13),
+			new Word("seen",345,270,2,false,0,0, 14),
+			
+			new Word("As",100,290,3,false,0,0, 15),
+			new Word("others",130,290,3,false,0,0, 16),
+			new Word("saw",190,290,3,false,0,0, 17),
+			new Word(" - ",225,290,3,false,0,0, 18),
+			new Word(" I ",240,290,3,false,0,0, 19),
+			new Word("could",255,290,3,false,0,0, 20),
+			new Word("not",310,290,3,false,0,0, 21),
+			new Word("bring",345,290,3,false,0,0, 22),
+			
+			new Word("My",100,310,4,false,0,0, 23),
+			new Word("passions",130,310,4,false,0,0, 24),
+			new Word("from",210,310,4,false,0,0, 25),
+			new Word(" a ",250,310,4,false,0,0, 26),
+			new Word("common",270,310,4,false,0,0, 27),
+			new Word("spring",345,310,4,false,0,0, 28),
+			
+			new Word("From",100,330,5,false,0,0, 29),
+			new Word("the",150,330,5,false,0,0, 30),
+			new Word("same",185,330,5,false,0,0, 31),
+			new Word("source",235,330,5,false,0,0, 32),
+			new Word(" I ",290,330,5,false,0,0, 33),
+			new Word("have",310,330,5,false,0,0, 34),
+			new Word("not",355,330,5,false,0,0, 35),
+			new Word("taken",390,330,5,false,0,0, 36),
+			
+			new Word("My",100,350,6,false,0,0, 37),
+			new Word("sorrow",130,350,6,false,0,0, 38),
+			new Word(" - ",190,350,6,false,0,0, 39),
+			new Word(" I ",205,350,6,false,0,0, 40),
+			new Word("could",225,350,6,false,0,0,41),
+			new Word("not",275,350,6,false,0,0, 42),
+			new Word("awaken",310,350,6,false,0,0, 43),
+			
+			new Word("My",100, 370, 7, false,0,0, 44),
+			new Word("heart",130,370,7,false,0,0, 45),
+			new Word("to",180,370,7,false,0,0, 46),
+			new Word("joy",205,370,7,false,0,0, 47),
+			new Word("at",240,370,7,false,0,0, 48),
+			new Word("the",265,370,7,false,0,0, 49),
+			new Word("same",300,370,7,false,0,0, 50),
+			new Word("tone",350,370,7,false,0,0, 51),
+			new Word(" - ",385,370,7,false,0,0, 52),
+			
+			new Word("And",100,390,8,false,0,0, 53),
+			new Word("all",140,390,8,false,0,0, 54),
+			new Word("I",170,390,8,false,0,0, 55),
+			new Word("lov'd",185,390,8,false,0,0, 56),
+			new Word(" - ",225,390,8,false,0,0, 57),
+			new Word(" I ",240,390,8,false,0,0, 58),
+			new Word("lov'd",260,390,8,false,0,0, 59),
+			new Word("alone",300,390,8,false,0,0, 60),
+			new Word(" - ",345,390,8,false,0,0, 61),
+			
+			new Word("Then",100,410,9,false,0,0, 62),
+			new Word(" - ",140,410,9,false,0,0, 63),
+			new Word("in",160,410,9,false,0,0, 64),
+			new Word("my",185,410,9,false,0,0, 65),
+			new Word("childhood",220,410,9,false,0,0, 66),
+			new Word(" - ",300,410,9,false,0,0, 67),
+			new Word("in",320,410,9,false,0,0, 68),
+			new Word("the",345,410,9,false,0,0, 69),
+			new Word("dawn",375,410,9,false,0,0, 70),
+			
+			new Word("Of",100,430,10,false,0,0, 71),
+			new Word("a",125,430,10,false,0,0, 72),
+			new Word("most",140,430,10,false,0,0, 73),
+			new Word("stormy",185,430,10,false,0,0, 74),
+			new Word("life",250,430,10,false,0,0, 75),
+			new Word(" - ",275,430,10,false,0,0, 76),
+			new Word("was",295,430,10,false,0,0, 77),
+			new Word("drawn",335,430,10,false,0,0, 78),
+			
+			new Word("From",100,450,11,false,0,0, 79),
+			new Word("ev'ry",150,450,11,false,0,0, 80),
+			new Word("depth",195,450,11,false,0,0, 81),
+			new Word("of",245,450,11,false,0,0, 82),
+			new Word("good",270,450,11,false,0,0, 83),
+			new Word("and",315,450,11,false,0,0, 84),
+			new Word("ill",350,450,11,false,0,0, 85),
+			
+			new Word("The",100,470,12,false,0,0, 86),
+			new Word("mystery",140,470,12,false,0,0, 87),
+			new Word("which",215,470,12,false,0,0, 88),
+			new Word("binds",270,470,12,false,0,0, 89),
+			new Word("me",320,470,12,false,0,0, 90),
+			new Word("still",350,470,12,false,0,0, 91),
+			new Word(" - ",380,470,12,false,0,0, 92),
+			
+			new Word("From",100,490,13,false,0,0, 93),
+			new Word("the",150,490,13,false,0,0, 94),
+			new Word("torrent,",185,490,13,false,0,0, 95),
+			new Word("or",250,490,13,false,0,0, 96),
+			new Word("the",275,490,13,false,0,0, 97),
+			new Word("fountain",310,490,13,false,0,0, 98),
+			new Word(" - ",375,490,13,false,0,0, 99),
+			
+			new Word("From",100,510,14,false,0,0, 100),
+			new Word("the",150,510,14,false,0,0, 101),
+			new Word("red",185,510,14,false,0,0, 102),
+			new Word("cliff",220,510,14,false,0,0, 103),
+			new Word("of",255,510,14,false,0,0, 104),
+			new Word("the",280,510,14,false,0,0, 105),
+			new Word("mountain",315,510,14,false,0,0, 106),
+			new Word(" - ",390,510,14,false,0,0, 107),
+			
+			new Word("From",100,530,15,false,0,0, 108),
+			new Word("the",150,530,15,false,0,0, 109),
+			new Word("sun",185,530,15,false,0,0, 110),
+			new Word("that",220,530,15,false,0,0, 111),
+			new Word("'round",255,530,15,false,0,0, 112),
+			new Word("me",315,530,15,false,0,0, 113),
+			new Word("roll'd",345,530,15,false,0,0,114),
+			
+			new Word("In",100,550,16,false,0,0, 115),
+			new Word("its",120,550,16,false,0,0, 116),
+			new Word("autumn",150,550,16,false,0,0, 117),
+			new Word("tint",220,550,16,false,0,0, 118),
+			new Word("of",255,550,16,false,0,0, 119),
+			new Word("gold",280,550,16,false,0,0, 120),
+			new Word(" - ",315,550,16,false,0,0, 121),
+			
+			new Word("From",100,570,17,false,0,0, 122),
+			new Word("the",150,570,17,false,0,0, 123),
+			new Word("lightning",185,570,17,false,0,0, 124),
+			new Word("in",260,570,17,false,0,0, 125),
+			new Word("the",280,570,17,false,0,0, 126),
+			new Word("sky",315,570,17,false,0,0, 127),
+			
+			new Word("As",100,590,18,false,0,0, 128),
+			new Word("it",130,590,18,false,0,0, 129),
+			new Word("pass'd",150,590,18,false,0,0, 130),
+			new Word("me",210,590,18,false,0,0, 131),
+			new Word("flying",240,590,18,false,0,0, 132),
+			new Word("by",290,590,18,false,0,0, 133),
+			new Word(" - ",310,590,18,false,0,0, 134),
+			
+			new Word("From",100,610,19,false,0,0, 135),
+			new Word("the",150,610,19,false,0,0, 136),
+			new Word("thunder,",185,610,19,false,0,0, 137),
+			new Word("and",255,610,19,false,0,0, 138),
+			new Word("the",290,610,19,false,0,0, 139),
+			new Word("storm",320,610,19,false,0,0, 140),
+			new Word(" - ",365,610,19,false,0,0, 141),
+			
+			new Word("And",100,630,20,false,0,0, 142),
+			new Word("the",140,630,20,false,0,0, 143),
+			new Word("cloud",170,630,20,false,0,0, 144),
+			new Word("that",220,630,20,false,0,0, 145),
+			new Word("took",260,630,20,false,0,0, 146),
+			new Word("the",300,630,20,false,0,0, 147),
+			new Word("form",330,630,20,false,0,0, 148),
+			
+			new Word("(When",100,650,21,false,0,0, 149),
+			new Word("the",155,650,21,false,0,0, 150),
+			new Word("rest",185,650,21,false,0,0, 151),
+			new Word("of",220,650,21,false,0,0, 152),
+			new Word("Heaven",245,650,21,false,0,0, 153),
+			new Word("was",310,650,21,false,0,0, 154),
+			new Word("blue)",350,650,21,false,0,0, 155),
+			
+			new Word("Of",100,670,22,false,0,0, 156),
+			new Word("a",125,670,22,false,0,0, 157),
+			new Word("demon",140,670,22,false,0,0, 158),
+			new Word("in",200,670,22,false,0,0, 159),
+			new Word("my",220,670,22,false,0,0, 160),
+			new Word("view",250,670,22,false,0,0, 161)
+			]; 
+	*/
+	alphaTitle = 0.5;
+	speedStep = 0.1;
+	speedCount = 0;
+	
+	pContext.fillStyle = "#191919";
+	pContext.fillRect(0,0,canvasWidth,canvasHeight);
+	
+	pContext.font = "bold 20px sans-serif";
+	pContext.fillStyle = "#ffffff";
+	pContext.globalAlpha = alphaTitle;
+	pContext.fillText("Alone by Edgar Allan Poe", 100, 220);
+	pContext.globalAlpha = 1;
+	
 	pContext.font = "bold 16px sans-serif";
-	pContext.fillStyle = "#000000";
 	for (var i = 0; i < poem.length;i++){
 		pContext.fillText(poem[i].text, poem[i].xPos, poem[i].yPos);
 	}
@@ -337,8 +582,8 @@ function poemCirclePacking() {
 	poem[0].setPos(poem[0].radius, poem[0].radius, true);
 	poem[1].setPos(canvasWidth - poem[1].radius, poem[1].radius, true);
 	
-	tempDrawCircle(poem[0].xPosFinal,poem[0].yPosFinal,poem[0].radius, false);
-	tempDrawCircle(poem[1].xPosFinal,poem[1].yPosFinal,poem[1].radius, false);
+	//tempDrawCircle(poem[0].xPosFinal,poem[0].yPosFinal,poem[0].radius, false);
+	//tempDrawCircle(poem[1].xPosFinal,poem[1].yPosFinal,poem[1].radius, false);
 	
 	for (var k = 2; k < poem.length; k++) {
 		placements = findPlacements(poem[k]);
@@ -389,17 +634,9 @@ function poemCirclePacking() {
 					*/
 				}
 			}
-			if (k == 40) {
-				tempDrawCircle(placements[i].xPos,placements[i].yPos,placements[i].radius, true);
-			}
 		}
 		poem[k].setPos(newX, newY, true);
-		if (k == 40) {
-			tempDrawCircle(poem[k].xPosFinal,poem[k].yPosFinal,poem[k].radius, true);
-		}
-		else {
-			tempDrawCircle(poem[k].xPosFinal,poem[k].yPosFinal,poem[k].radius, false);
-		}
+		//tempDrawCircle(poem[k].xPosFinal,poem[k].yPosFinal,poem[k].radius, false);
 		
 	}
 }
@@ -409,10 +646,10 @@ function tempDrawCircle(x,y,rad, check){
 		pContext.beginPath();
 		pContext.arc(x, y, rad, 0, Math.PI*2, false);
 		if (check) {
-			pContext.strokeStyle = "#FF0000";
+			pContext.strokeStyle = "#ff0000";
 		}
 		else {
-			pContext.strokeStyle = "#000000";
+			pContext.strokeStyle = "#ffffff";
 		}
 		pContext.stroke();		
 }
@@ -561,7 +798,6 @@ function poemFinalPosPrint(){
 	}
 }
 
-
 // calling function to animate poem
 function poemAnimate() {
 	for (var i = 0; i < 2* poem.length;i++) {
@@ -570,27 +806,38 @@ function poemAnimate() {
 	animate();
 }
 
+// calling function from 'play' icon
+function poemStart() {
+	var audio = new Audio('poe.mp3');	
+	if (!pButton.disabled) {
+		displayText.innerHTML = "Alone by EA Poe";
+		pButton.disabled = true;
+		audio.play();
+		setTimeout(function(){ 
+			poemAnimate();
+		}, 5000);
+	}
+}
 
-function initplay(canvasElement) {
+function initplay(canvasElement, startButton, displayText, divID) {
     if (!canvasElement) {
         canvasElement = document.createElement("canvas");
 	canvasElement.id = "a";
-	document.body.appendChild(canvasElement);
     }
+	var div = document.getElementById(divID);
+    div.appendChild(canvasElement);
+	//document.body.appendChild(canvasElement);
+	
     pCanvasElement = canvasElement;
 	pContext = pCanvasElement.getContext("2d");
 	
 	pCanvasElement.width = canvasWidth;
     pCanvasElement.height = canvasHeight;
-    pCanvasElement.addEventListener("click", playOnClick, false);
-	poemComplete = true;
+    //pCanvasElement.addEventListener("click", playOnClick, false);
+	pButton = startButton;
 	
+	poemComplete = true;
 	poemStartPosition();
 	//poemCirclePacking();
 	//poemFinalPosPrint();
-	
-	//var audio = new Audio('poe.mp3');
-	//audio.play();
-	
-	//poemAnimate();
 }
