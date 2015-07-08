@@ -2,6 +2,10 @@ body {
 	padding-top: 50px;
 }
 
+.aside {
+	font-size: 12px;
+}
+
 .pseudo {
 	padding-left: 20px;
 }

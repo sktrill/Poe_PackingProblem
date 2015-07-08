@@ -70,7 +70,7 @@
 			</p>
 			<h4>
 				<span class="label label-primary">#optimization</span>
-				<span class="label label-primary">#visualization</span>
+				<span class="label label-primary">#animation</span>
 			</h4>
 		</div>
 	
@@ -153,15 +153,20 @@
 					<li>Kubach, T., Bortfeldt, A., Gehring, H.: Parallel greedy algorithms for packing unequal circles into a strip or a rectangle. Cent. Eur. J. Oper. Res. 17, 461-477 (2009)</li>
 					<li>Huang, W.Q., Li Y., Li, C.M., Xu, R.C: New Heuristics for packing unequal circles into a circular container. Comput. Oper. Res. 33, 2125-2142 (2006)</li>
 				</ul>
+				<p class = "aside">
+				Music source: Alone by Edgar Allan Poe read by Henry Halloway
+				</p>
 				</p>
 			</div>
 			<div class="col-md-6" id="gameDiv">
 			<h3 class = "gameSummary"><span id="displayText">Press play to start</span></h3>
 			<div class = "play">
-				<button class="btn btn-info btn-xs" id = "startButton" onclick = "poemStart()"><span class="glyphicon glyphicon-play playSelect"></span></button>
+				<button class="btn btn-primary btn-xs" id = "startButton" onclick = "poemStart()"><span class="glyphicon glyphicon-play playSelect"></span></button>
 				<canvas id="canvas"></canvas>
+			<p>
+				<a onclick = "poemShowCircle()" id = "showHideLink" >Show circles</a>
+			</p>
 			</div>
-			<p></p>
 			</div>
 		</div>
 	</div>
@@ -169,7 +174,7 @@
 	<!-- Scripts -->
 	<script src="poem_poe.js"></script>	
 	<script>
-		initplay(canvas, document.getElementById('startButton'), document.getElementById('displayText'), "gameDiv");
+		initplay(canvas, document.getElementById('startButton'), document.getElementById('displayText'), document.getElementById('showHideLink'), "gameDiv");
 	</script>
 </body>
 </html>
