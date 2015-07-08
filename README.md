@@ -1,4 +1,4 @@
-# Poe_PackingProblem
+# Poe - Packing Problem
 
 Play with the app here: https://sk-poe-packingproblem.herokuapp.com/
 
