@@ -3,18 +3,18 @@ var canvasHeight = 1055;
 
 var pCanvasElement;
 var pContext;
-var pButton;
-var pDraw; 
-var pTextOffsets = new Array();
 
-var poem = new Array();
-var doneAnimation = new Array();
-var poemComplete;
-var showCircles;
+var pTextOffsets = new Array();
+var poem = new Array(); // array of Word objects
 var alphaTitle; // opacity for title
 var speedStep; // for animation speed
 var speedCount; // for animation
 
+// global booleans
+var pDraw;
+var doneAnimation = new Array(); // array to check whether each word has reached its final (x,y) position
+var poemComplete;
+var showCircles;
 
 // request animation frame for browser cross compatibility
 window.requestAnimFrame = (function(callback) {
@@ -24,7 +24,7 @@ window.requestAnimFrame = (function(callback) {
 	};
   })();
 
-// object for possible placement of a circle in the container
+// class for possible placement of a circle in the container
 function Place(xPos, yPos, radius, tangent1, tangent2, lambda, wordNo) {
 	this.xPos = xPos;
     this.yPos = yPos;
@@ -35,7 +35,7 @@ function Place(xPos, yPos, radius, tangent1, tangent2, lambda, wordNo) {
 	this.wordNo = wordNo;
 }
 
-// object for each word of the poem  
+// class for each word of the poem  
 function Word(text, xPos, yPos, line, posFinal, xPosFinal, yPosFinal, wordNo) {
 	this.xPos = xPos;
     this.yPos = yPos;
@@ -854,9 +854,9 @@ function poemShowCircle() {
 // calling function from 'play' icon
 function poemStart() {
 	var audio = new Audio('poe.mp3');	
-	if (!pButton.disabled) {
+	if (!startButton.disabled) {
 		displayText.innerHTML = "Alone by EA Poe";
-		pButton.disabled = true;
+		startButton.disabled = true;
 		audio.play();
 		setTimeout(function(){ 
 			poemAnimate();
@@ -879,7 +879,7 @@ function initplay(canvasElement, startButton, displayText, showHideLink, divID) 
 	pCanvasElement.width = canvasWidth;
     pCanvasElement.height = canvasHeight;
     //pCanvasElement.addEventListener("click", playOnClick, false);
-	pButton = startButton;
+	//pButton = startButton;
 	pDraw = false;
 	showCircles = false;
 	poemComplete = false;
